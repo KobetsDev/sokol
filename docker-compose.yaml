@@ -1,0 +1,32 @@
+version: "3"
+
+services:
+  tg_bot:
+    build:
+      context: ./tg_bot/
+      dockerfile: Dockerfile
+    volumes:
+      - ./tg_bot:/usr/src/tg_bot
+    # ports:
+    #   - "5432:5432"
+
+  api:
+    build:
+      context: ./api/
+      dockerfile: Dockerfile
+    volumes:
+      - ./api:/usr/src/api
+    ports:
+      - "80:80"
+      - "443:443"
+  # nginx:
+  #   build:
+  #     context: ./docker/nginx
+  #     dockerfile: Dockerfile
+  #   depends_on:
+  #     - web
+  #     - postgresdb
+  #   ports:
+  #     - "80:80"
+  #   volumes:
+  #     - ./static/:/static

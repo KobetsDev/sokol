@@ -1,0 +1,5 @@
+aiogram==2.21
+python-dotenv
+requests
+pymongo
+pymongo[srv]
