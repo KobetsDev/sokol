@@ -260,19 +260,19 @@ var Cafe = {
             return false;
         }
         if (Cafe.modeOrder) {
-            var comment = $('.js-order-comment-field').val();
-            var params = {
-                order_data: Cafe.getOrderData(),
-                comment: comment
-            };
-            if (Cafe.userId && Cafe.userHash) {
-                params.user_id = Cafe.userId;
-                params.user_hash = Cafe.userHash;
-            }
-            var invoiceSupported = Telegram.WebApp.isVersionAtLeast('6.1');
-            if (invoiceSupported) {
-                params.invoice = 1;
-            }
+            // var comment = $('.js-order-comment-field').val();
+            // var params = {
+            //     order_data: Cafe.getOrderData(),
+            //     comment: comment
+            // };
+            // if (Cafe.userId && Cafe.userHash) {
+            //     params.user_id = Cafe.userId;
+            //     params.user_hash = Cafe.userHash;
+            // }
+            // var invoiceSupported = Telegram.WebApp.isVersionAtLeast('6.1');
+            // if (invoiceSupported) {
+            //     params.invoice = 1;
+            // }
             Cafe.toggleLoading(true);
             Cafe.apiRequest('makeOrder', params, function (result) {
                 console.log(result)
