@@ -36,7 +36,7 @@ class ApiController {
         //     "user_hash": null
         // }
         let prices = []
-        console.log(zap.order_data.toString())
+        // console.log(zap.order_data.toString())
         zap.order_data = JSON.parse(zap.order_data.toString())
         console.log(zap.order_data)
         for (var key in zap.order_data) {

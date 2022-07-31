@@ -316,10 +316,11 @@ var Cafe = {
         $('.js-status').removeClass('shown');
     },
     apiRequest: function (method, data, onCallback) {
+        data.order_data = JSON.stringify(data.order_data)
         var authData = Telegram.WebApp.initData || '';
         $.ajax('https://api.sokol.one/api/create_link', {
             type: 'POST',
-            data: JSON.stringify($.extend(data, { _auth: authData, method: method })),
+            data: $.extend(data, { _auth: authData, method: method }),
             dataType: 'json',
             xhrFields: {
                 withCredentials: true
