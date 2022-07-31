@@ -2,6 +2,7 @@ from aiogram import types
 from aiogram.dispatcher.filters.builtin import CommandStart
 from keyboards.default.main_kb import main_kb
 from keyboards.default.register_kb import register_kb
+from keyboards.inline.wev_app import webAppKeyboard
 from utils.mongo.user_class import User
 
 from loader import dp
@@ -11,6 +12,7 @@ from loader import dp
 async def bot_start(message: types.Message):
     # check if user in db
     if User(message.from_user.id).get_info():
+        await message.answer(f'{message.from_user.full_name}, добро пожаловать Домой,', reply_markup=webAppKeyboard())
         if User(message.from_user.id).get_info().get("status") == 1:
             await message.answer(f'{message.from_user.full_name}, добро пожаловать Домой,', reply_markup=main_kb)
         else:
