@@ -45,7 +45,7 @@ class ApiController {
             //тут поиск по id в бд
             const product = await Product.findOne({ _id: zap.order_data[key].id })
             console.log(product)
-            prices.push({ 'label': product.title, 'amount': product.price })
+            prices.push({ 'label': product.title, 'amount': product.count })
         }
         const link = `https://api.telegram.org/bot${process.env.BOT_TOKEN}/createInvoiceLink`
         console.log(link)
@@ -68,6 +68,7 @@ class ApiController {
         // res.json('qwe')
         await axios.post(link, cart)
             .then((data) => {
+                console.log(data)
                 return res.json({ status: 'ok', url: data.data.result })
             }).catch((err) => {
                 console.log(err)
