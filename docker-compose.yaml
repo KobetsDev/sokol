@@ -1,8 +1,7 @@
 version: "3"
 
 services:
-  environment:
-    - BOT_TOKEN:'5522439425:AAEuspe2aOWG_ao8L1zgrrBG20o_yIy0238'
+  environment: BOT_TOKEN:'5522439425:AAEuspe2aOWG_ao8L1zgrrBG20o_yIy0238'
 
   tg_bot:
     build:
