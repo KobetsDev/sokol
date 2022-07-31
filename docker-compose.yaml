@@ -1,14 +1,17 @@
 version: "3"
 
 services:
+  environment:
+    - BOT_TOKEN:'5522439425:AAEuspe2aOWG_ao8L1zgrrBG20o_yIy0238'
+
   tg_bot:
     build:
       context: ./tg_bot/
       dockerfile: Dockerfile
     volumes:
       - ./tg_bot:/usr/src/tg_bot
-    # ports:
-    #   - "5432:5432"
+    env_file:
+      - api.env
 
   api:
     build:
