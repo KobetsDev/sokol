@@ -4,7 +4,7 @@
 {{ data }}
 <section class="cafe-page cafe-items">
     {% for product in products %}
-        <div class="cafe-item js-item" data-item-id="1" data-item-price="4990">
+        <div class="cafe-item js-item" data-item-id="{{ product._id }}" data-item-price="{{ product._id }}">
             <div class="cafe-item-counter js-item-counter"></div>
             <div class="cafe-item-photo">
                 <picture class="cafe-item-lottie js-item-lottie">
