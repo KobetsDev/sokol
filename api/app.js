@@ -7,6 +7,7 @@ import path, { dirname } from 'path'
 import mongoose from 'mongoose'
 import router from './routes/index.js'
 import { fileURLToPath } from 'url';
+import bodyParser from 'body-parser'
 const app = express()
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -22,6 +23,8 @@ nunjucks.configure('templates', {
     autoescape: true,
     express: app
 })
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json())
 app.use(express.static(__dirname + '/static'));
 // app.use('/static', express.static((path.resolve('static'))))//__dirname, 'static')))
 app.disable('etag')
