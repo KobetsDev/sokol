@@ -8,6 +8,11 @@ from aiogram.types.message import ContentType
 from loader import dp, bot
 
 
+@dp.message_handler(commands=['buy'])
+async def cmd_buy(message: types.Message):
+    await bot.send_message(message.chat.id, 'qwe')
+
+
 @dp.pre_checkout_query_handler(lambda query: True)
 async def process_pre_checkout_query(pre_checkout_query: types.PreCheckoutQuery):
     print('qwe', pre_checkout_query)
@@ -21,7 +26,7 @@ async def process_successful_payment(message: types.Message):
     for key, val in pmnt.items():
         print(f'{key} = {val}')
 
-    await bot.answer(
+    await bot.send_message(
         message.chat.id, f'''
 Ура! Платеж на сумму `{message.successful_payment.total_amount // 100} {message.successful_payment.currency}` совершен успешно!
 Приятного ожидания!
