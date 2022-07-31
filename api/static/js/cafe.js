@@ -264,7 +264,7 @@ var Cafe = {
         if (!Cafe.canPay || Cafe.isLoading || Cafe.isClosed) {
             return false;
         }
-        console.log('qwe')
+        // Cafe.modeOrder
         if (true) {
             var comment = $('.js-order-comment-field').val();
             var params = {
@@ -281,11 +281,11 @@ var Cafe = {
             }
             Cafe.toggleLoading(true);
             Cafe.apiRequest('makeOrder', params, function (result) {
-                console.log(result)
+                // console.log(result)
                 Cafe.toggleLoading(false);
                 if (result.url) {
                     Telegram.WebApp.openInvoice(result.url, function (status) {
-                        console.log(status)
+                        // console.log(status)
                         Telegram.WebApp.close()
                         if (status == 'paid') {
                             Telegram.WebApp.close();
