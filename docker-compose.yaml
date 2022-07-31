@@ -8,8 +8,6 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./tg_bot:/usr/src/tg_bot
-    environment:
-      - BOT_TOKEN: "5522439425:AAEuspe2aOWG_ao8L1zgrrBG20o_yIy0238"
     env_file:
       - api.env
 
@@ -19,8 +17,6 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./api:/usr/src/api
-    environment:
-      - BOT_TOKEN: "5522439425:AAEuspe2aOWG_ao8L1zgrrBG20o_yIy0238"
     ports:
       - "80:80"
       - "443:443"
