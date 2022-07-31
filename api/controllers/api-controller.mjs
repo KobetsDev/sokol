@@ -70,7 +70,7 @@ class ApiController {
             .then((data) => {
                 return res.json({ status: 'ok', url: data.data.result })
             }).catch((err) => {
-                console.log('err')
+                console.log(err)
                 return res.json({ status: 'bad' })
             });
     }
