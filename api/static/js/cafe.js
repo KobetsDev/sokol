@@ -172,14 +172,9 @@ var Cafe = {
                 }).hideProgress();
             }
         } else {
-            // mainButton.setParams({
-            //     is_visible: !!Cafe.canPay,
-            //     text: 'VIEW ORDER',
-            //     color: '#31b545'
-            // }).hideProgress();
             mainButton.setParams({
                 is_visible: !!Cafe.canPay,
-                text: 'PAY ' + Cafe.formatPrice(Cafe.totalPrice),
+                text: 'VIEW ORDER',
                 color: '#31b545'
             }).hideProgress();
         }
@@ -264,6 +259,7 @@ var Cafe = {
         if (!Cafe.canPay || Cafe.isLoading || Cafe.isClosed) {
             return false;
         }
+        console.log('qwe')
         if (Cafe.modeOrder) {
             var comment = $('.js-order-comment-field').val();
             var params = {
