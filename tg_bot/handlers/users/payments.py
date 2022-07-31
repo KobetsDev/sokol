@@ -30,6 +30,4 @@ async def process_successful_payment(message: types.Message):
         message.chat.id, f'''
 Ура! Платеж на сумму `{message.successful_payment.total_amount // 100} {message.successful_payment.currency}` совершен успешно!
 Приятного ожидания!
-Заказать ещё своему другу -  [/buy](/buy "Заказать ещё")
-''',  parse_mode='MarkdownV2'
-    )
+Заказать ещё своему другу - /buy''')
