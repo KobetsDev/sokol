@@ -317,7 +317,7 @@ var Cafe = {
     },
     apiRequest: function (method, data, onCallback) {
         // data.order_data = JSON.stringify(data.order_data)
-        console.log(data)
+        console.log('qwe data', data)
         var authData = Telegram.WebApp.initData || '';
         $.ajax('https://api.sokol.one/api/create_link', {
             type: 'POST',
