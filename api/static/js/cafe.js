@@ -174,9 +174,14 @@ var Cafe = {
         } else {
             mainButton.setParams({
                 is_visible: !!Cafe.canPay,
-                text: 'VIEW ORDER',
+                text: 'PAY ' + Cafe.formatPrice(Cafe.totalPrice),
                 color: '#31b545'
             }).hideProgress();
+            // mainButton.setParams({
+            //     is_visible: !!Cafe.canPay,
+            //     text: 'VIEW ORDER',
+            //     color: '#31b545'
+            // }).hideProgress();
         }
         Telegram.WebApp.isClosingConfirmationEnabled = !!Cafe.canPay;
     },
@@ -260,7 +265,7 @@ var Cafe = {
             return false;
         }
         console.log('qwe')
-        if (Cafe.modeOrder) {
+        if (true) {
             var comment = $('.js-order-comment-field').val();
             var params = {
                 order_data: Cafe.getOrderData(),
