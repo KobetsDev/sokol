@@ -14,8 +14,9 @@ class ApiController {
     // http://localhost:8000/api/create_link
     async create_link(req, res, next) {
         let zap = req.body
+        // let zap = '"[{\\"id\\":123,\\"count\\":1},{\\"id\\":124,\\"count\\":1}]"'
         console.log('zap', zap)
-        // то что приходит
+        // то что приходит '"[{\\"id\\":123,\\"count\\":1},{\\"id\\":124,\\"count\\":1}]"'
         // api_1     | {
         //     api_1     |   order_data: '[{"id":123,"count":1},{"id":124,"count":1}]',
         //     api_1     |   invoice: '1',
@@ -37,7 +38,7 @@ class ApiController {
         // }
         let prices = []
         // console.log(zap.order_data.toString())
-        zap.order_data = JSON.parse(zap.order_data.toString())
+        zap.order_data = JSON.parse(zap.order_data)
         console.log(zap.order_data)
         for (var key in zap.order_data) {
             console.log(zap.order_data[key].id)
