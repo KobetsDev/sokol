@@ -8,8 +8,6 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./tg_bot:/usr/src/tg_bot
-    env_file:
-      - api.env
 
   api:
     build:
