@@ -172,9 +172,14 @@ var Cafe = {
                 }).hideProgress();
             }
         } else {
+            // mainButton.setParams({
+            //     is_visible: !!Cafe.canPay,
+            //     text: 'VIEW ORDER',
+            //     color: '#31b545'
+            // }).hideProgress();
             mainButton.setParams({
                 is_visible: !!Cafe.canPay,
-                text: 'VIEW ORDER',
+                text: 'PAY ' + Cafe.formatPrice(Cafe.totalPrice),
                 color: '#31b545'
             }).hideProgress();
         }
@@ -316,8 +321,6 @@ var Cafe = {
         $('.js-status').removeClass('shown');
     },
     apiRequest: function (method, data, onCallback) {
-        // data.order_data = JSON.stringify(data.order_data)
-        console.log('qwe data', data)
         var authData = Telegram.WebApp.initData || '';
         $.ajax('https://api.sokol.one/api/create_link', {
             type: 'POST',

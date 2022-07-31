@@ -48,7 +48,6 @@ class ApiController {
             prices.push({ 'label': product.title, 'amount': product.price })
         }
         const link = `https://api.telegram.org/bot${process.env.BOT_TOKEN}/createInvoiceLink`
-        console.log(link)
         const cart = {
             'title': 'Ваш заказ',
             'description': 'За заказом подходите к баристе',
