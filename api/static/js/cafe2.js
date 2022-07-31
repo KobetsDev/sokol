@@ -1,13 +1,16 @@
 (function ($) {
     $.fn.redraw = function () {
-        return this.map(function () { this.offsetTop; return this; });
+        return this.map(function () {
+            this.offsetTop;
+            return this;
+        });
     };
 })(jQuery);
 
 var Cafe = {
-    canPay: false,
-    modeOrder: false,
-    totalPrice: 0,
+    canPay: true,
+    modeOrder: true,
+    totalPrice: 29,
 
     init: function (options) {
         Telegram.WebApp.ready();
@@ -15,9 +18,12 @@ var Cafe = {
         Cafe.userId = options.userId;
         Cafe.userHash = options.userHash;
         Cafe.initLotties();
+        var userId = Telegram.WebApp.initData && Telegram.WebApp.initData.user && Telegram.WebApp.initData.user.id || Cafe.userId;
+        if (options.debug) {
+            var userId = 569452912;
+        }
         $('body').show();
-        if (!Telegram.WebApp.initDataUnsafe ||
-            !Telegram.WebApp.initDataUnsafe.query_id) {
+        if (!userId) {
             Cafe.isClosed = true;
             $('body').addClass('closed');
             Cafe.showStatus('Cafe is temporarily closed');
@@ -34,8 +40,6 @@ var Cafe = {
         Telegram.WebApp.MainButton.setParams({
             text_color: '#fff'
         }).onClick(Cafe.mainBtnClicked);
-        Telegram.WebApp.BackButton.onClick(Cafe.backBtnClicked);
-        Telegram.WebApp.setHeaderColor('bg_color');
         initRipple();
     },
     initLotties: function () {
@@ -55,21 +59,16 @@ var Cafe = {
     },
     eIncrClicked: function (e) {
         e.preventDefault();
-        Telegram.WebApp.HapticFeedback.impactOccurred('light');
         var itemEl = $(this).parents('.js-item');
         Cafe.incrClicked(itemEl, 1);
     },
     eDecrClicked: function (e) {
         e.preventDefault();
-        Telegram.WebApp.HapticFeedback.impactOccurred('light');
         var itemEl = $(this).parents('.js-item');
         Cafe.incrClicked(itemEl, -1);
     },
     eEditClicked: function (e) {
         e.preventDefault();
-        Cafe.toggleMode(false);
-    },
-    backBtnClicked: function () {
         Cafe.toggleMode(false);
     },
     getOrderItem: function (itemEl) {
@@ -151,11 +150,6 @@ var Cafe = {
         }
         return s.join(dec)
     },
-    updateBackgroundColor: function () {
-        var style = window.getComputedStyle(document.body);
-        var bg_color = parseColorToHex(style.backgroundColor || '#fff');
-        Telegram.WebApp.setBackgroundColor(bg_color);
-    },
     updateMainButton: function () {
         var mainButton = Telegram.WebApp.MainButton;
         if (Cafe.modeOrder) {
@@ -178,7 +172,6 @@ var Cafe = {
                 color: '#31b545'
             }).hideProgress();
         }
-        Telegram.WebApp.isClosingConfirmationEnabled = !!Cafe.canPay;
     },
     updateTotalPrice: function () {
         var total_price = 0;
@@ -223,7 +216,7 @@ var Cafe = {
         if (mode_order) {
             var height = $('.cafe-items').height();
             $('.js-item-lottie').each(function () {
-                RLottie.pause(this);
+                RLottie.setVisible(this, false);
             });
             $('.cafe-order-overview').show();
             $('.cafe-items').css('maxHeight', height).redraw();
@@ -232,21 +225,24 @@ var Cafe = {
                 autosize.update(this);
             });
             Telegram.WebApp.expand();
-            Telegram.WebApp.BackButton.show();
+            setTimeout(function () {
+                $('.js-item-lottie').each(function () {
+                    RLottie.setVisible(this, true);
+                });
+            }, anim_duration);
         } else {
             $('.js-item-lottie').each(function () {
-                RLottie.reset(this);
+                RLottie.setVisible(this, false);
             });
             $('body').removeClass('order-mode');
             setTimeout(function () {
                 $('.cafe-items').css('maxHeight', '');
                 $('.cafe-order-overview').hide();
                 $('.js-item-lottie').each(function () {
+                    RLottie.setVisible(this, true);
                 });
             }, anim_duration);
-            Telegram.WebApp.BackButton.hide();
         }
-        Cafe.updateBackgroundColor();
         Cafe.updateMainButton();
     },
     toggleLoading: function (loading) {
@@ -265,36 +261,39 @@ var Cafe = {
                 order_data: Cafe.getOrderData(),
                 comment: comment
             };
-            if (Cafe.userId && Cafe.userHash) {
+            if (!Telegram.WebApp.initData ||
+                !Telegram.WebApp.initData.user ||
+                !Telegram.WebApp.initData.user.id) {
                 params.user_id = Cafe.userId;
                 params.user_hash = Cafe.userHash;
             }
-            var invoiceSupported = Telegram.WebApp.isVersionAtLeast('6.1');
-            if (invoiceSupported) {
-                params.invoice = 1;
-            }
             Cafe.toggleLoading(true);
+            alert('1s22')
+            // // console.log(Telegram.WebApp.initData())
+            // Telegram.WebApp.openInvoice('https://i.ibb.co/xfpgTpW/coffe.jpg', function(status) {
+            //     console.log(status)
+            //     if (status == 'paid') {
+            //         Telegram.WebApp.close();
+            //     } else if (status == 'failed') {
+            //         Telegram.WebApp.HapticFeedback.notificationOccurred('error');
+            //         Cafe.showStatus('Payment has been failed.');
+            //     } else {
+            //         Telegram.WebApp.HapticFeedback.notificationOccurred('warning');
+            //         Cafe.showStatus('You have cancelled this order.');
+            //     }
+            // });
+            // Telegram.WebApp.openInvoice('https://kerker.com')
+            // Telegram.WebApp.sendData(JSON.stringify(params));
+            // alert('SENDEDs')
+            // Cafe.toggleLoading(false);
+            // Telegram.WebApp.close();
             Cafe.apiRequest('makeOrder', params, function (result) {
+                console.log(result)
                 Cafe.toggleLoading(false);
                 if (result.ok) {
-                    if (invoiceSupported) {
-                        Telegram.WebApp.openInvoice(result.invoice_url, function (status) {
-                            if (status == 'paid') {
-                                Telegram.WebApp.close();
-                            } else if (status == 'failed') {
-                                Telegram.WebApp.HapticFeedback.notificationOccurred('error');
-                                Cafe.showStatus('Payment has been failed.');
-                            } else {
-                                Telegram.WebApp.HapticFeedback.notificationOccurred('warning');
-                                Cafe.showStatus('You have cancelled this order.');
-                            }
-                        });
-                    } else {
-                        Telegram.WebApp.close();
-                    }
+                    Telegram.WebApp.close();
                 }
                 if (result.error) {
-                    Telegram.WebApp.HapticFeedback.notificationOccurred('error');
                     Cafe.showStatus(result.error);
                 }
             });
@@ -309,7 +308,9 @@ var Cafe = {
         clearTimeout(Cafe.statusTo);
         $('.js-status').text(text).addClass('shown');
         if (!Cafe.isClosed) {
-            Cafe.statusTo = setTimeout(function () { Cafe.hideStatus(); }, 2500);
+            Cafe.statusTo = setTimeout(function () {
+                Cafe.hideStatus();
+            }, 2500);
         }
     },
     hideStatus: function () {
@@ -317,8 +318,9 @@ var Cafe = {
         $('.js-status').removeClass('shown');
     },
     apiRequest: function (method, data, onCallback) {
-        var authData = Telegram.WebApp.initData || '';
-        $.ajax('https://api.sokol.one/api/create_link', {
+        var authData = Telegram.WebApp.initDataRaw || '';
+        
+        $.ajax('https://webappcontent.telegram.org/cafe/api', {
             type: 'POST',
             data: $.extend(data, { _auth: authData, method: method }),
             dataType: 'json',
@@ -335,38 +337,143 @@ var Cafe = {
     }
 };
 
-function parseColorToHex(color) {
-    color += '';
-    var match;
-    if (match = /^\s*#([0-9a-f]{6})\s*$/i.exec(color)) {
-        return '#' + match[1].toLowerCase();
-    }
-    else if (match = /^\s*#([0-9a-f])([0-9a-f])([0-9a-f])\s*$/i.exec(color)) {
-        return ('#' + match[1] + match[1] + match[2] + match[2] + match[3] + match[3]).toLowerCase();
-    }
-    else if (match = /^\s*rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+\.{0,1}\d*))?\)\s*$/.exec(color)) {
-        var r = parseInt(match[1]), g = parseInt(match[2]), b = parseInt(match[3]);
-        r = (r < 16 ? '0' : '') + r.toString(16);
-        g = (g < 16 ? '0' : '') + g.toString(16);
-        b = (b < 16 ? '0' : '') + b.toString(16);
-        return '#' + r + g + b;
-    }
-    return false;
-}
-
 /*!
   Autosize 3.0.20
   license: MIT
   http://www.jacklmoore.com/autosize
 */
-!function (e, t) { if ("function" == typeof define && define.amd) define(["exports", "module"], t); else if ("undefined" != typeof exports && "undefined" != typeof module) t(exports, module); else { var n = { exports: {} }; t(n.exports, n), e.autosize = n.exports } }(this, function (e, t) { "use strict"; function n(e) { function t() { var t = window.getComputedStyle(e, null); "vertical" === t.resize ? e.style.resize = "none" : "both" === t.resize && (e.style.resize = "horizontal"), s = "content-box" === t.boxSizing ? -(parseFloat(t.paddingTop) + parseFloat(t.paddingBottom)) : parseFloat(t.borderTopWidth) + parseFloat(t.borderBottomWidth), isNaN(s) && (s = 0), l() } function n(t) { var n = e.style.width; e.style.width = "0px", e.offsetWidth, e.style.width = n, e.style.overflowY = t } function o(e) { for (var t = []; e && e.parentNode && e.parentNode instanceof Element;)e.parentNode.scrollTop && t.push({ node: e.parentNode, scrollTop: e.parentNode.scrollTop }), e = e.parentNode; return t } function r() { var t = e.style.height, n = o(e), r = document.documentElement && document.documentElement.scrollTop; e.style.height = "auto"; var i = e.scrollHeight + s; return 0 === e.scrollHeight ? void (e.style.height = t) : (e.style.height = i + "px", u = e.clientWidth, n.forEach(function (e) { e.node.scrollTop = e.scrollTop }), void (r && (document.documentElement.scrollTop = r))) } function l() { r(); var t = Math.round(parseFloat(e.style.height)), o = window.getComputedStyle(e, null), i = Math.round(parseFloat(o.height)); if (i !== t ? "visible" !== o.overflowY && (n("visible"), r(), i = Math.round(parseFloat(window.getComputedStyle(e, null).height))) : "hidden" !== o.overflowY && (n("hidden"), r(), i = Math.round(parseFloat(window.getComputedStyle(e, null).height))), a !== i) { a = i; var l = d("autosize:resized"); try { e.dispatchEvent(l) } catch (e) { } } } if (e && e.nodeName && "TEXTAREA" === e.nodeName && !i.has(e)) { var s = null, u = e.clientWidth, a = null, p = function () { e.clientWidth !== u && l() }, c = function (t) { window.removeEventListener("resize", p, !1), e.removeEventListener("input", l, !1), e.removeEventListener("keyup", l, !1), e.removeEventListener("autosize:destroy", c, !1), e.removeEventListener("autosize:update", l, !1), Object.keys(t).forEach(function (n) { e.style[n] = t[n] }), i.delete(e) }.bind(e, { height: e.style.height, resize: e.style.resize, overflowY: e.style.overflowY, overflowX: e.style.overflowX, wordWrap: e.style.wordWrap }); e.addEventListener("autosize:destroy", c, !1), "onpropertychange" in e && "oninput" in e && e.addEventListener("keyup", l, !1), window.addEventListener("resize", p, !1), e.addEventListener("input", l, !1), e.addEventListener("autosize:update", l, !1), e.style.overflowX = "hidden", e.style.wordWrap = "break-word", i.set(e, { destroy: c, update: l }), t() } } function o(e) { var t = i.get(e); t && t.destroy() } function r(e) { var t = i.get(e); t && t.update() } var i = "function" == typeof Map ? new Map : function () { var e = [], t = []; return { has: function (t) { return e.indexOf(t) > -1 }, get: function (n) { return t[e.indexOf(n)] }, set: function (n, o) { e.indexOf(n) === -1 && (e.push(n), t.push(o)) }, delete: function (n) { var o = e.indexOf(n); o > -1 && (e.splice(o, 1), t.splice(o, 1)) } } }(), d = function (e) { return new Event(e, { bubbles: !0 }) }; try { new Event("test") } catch (e) { d = function (e) { var t = document.createEvent("Event"); return t.initEvent(e, !0, !1), t } } var l = null; "undefined" == typeof window || "function" != typeof window.getComputedStyle ? (l = function (e) { return e }, l.destroy = function (e) { return e }, l.update = function (e) { return e }) : (l = function (e, t) { return e && Array.prototype.forEach.call(e.length ? e : [e], function (e) { return n(e, t) }), e }, l.destroy = function (e) { return e && Array.prototype.forEach.call(e.length ? e : [e], o), e }, l.update = function (e) { return e && Array.prototype.forEach.call(e.length ? e : [e], r), e }), t.exports = l });
+!function (e, t) {
+    if ("function" == typeof define && define.amd) define(["exports", "module"], t); else if ("undefined" != typeof exports && "undefined" != typeof module) t(exports, module); else {
+        var n = { exports: {} };
+        t(n.exports, n), e.autosize = n.exports
+    }
+}(this, function (e, t) {
+    "use strict";
+
+    function n(e) {
+        function t() {
+            var t = window.getComputedStyle(e, null);
+            "vertical" === t.resize ? e.style.resize = "none" : "both" === t.resize && (e.style.resize = "horizontal"), s = "content-box" === t.boxSizing ? -(parseFloat(t.paddingTop) + parseFloat(t.paddingBottom)) : parseFloat(t.borderTopWidth) + parseFloat(t.borderBottomWidth), isNaN(s) && (s = 0), l()
+        }
+
+        function n(t) {
+            var n = e.style.width;
+            e.style.width = "0px", e.offsetWidth, e.style.width = n, e.style.overflowY = t
+        }
+
+        function o(e) {
+            for (var t = []; e && e.parentNode && e.parentNode instanceof Element;) e.parentNode.scrollTop && t.push({
+                node: e.parentNode,
+                scrollTop: e.parentNode.scrollTop
+            }), e = e.parentNode;
+            return t
+        }
+
+        function r() {
+            var t = e.style.height, n = o(e), r = document.documentElement && document.documentElement.scrollTop;
+            e.style.height = "auto";
+            var i = e.scrollHeight + s;
+            return 0 === e.scrollHeight ? void (e.style.height = t) : (e.style.height = i + "px", u = e.clientWidth, n.forEach(function (e) {
+                e.node.scrollTop = e.scrollTop
+            }), void (r && (document.documentElement.scrollTop = r)))
+        }
+
+        function l() {
+            r();
+            var t = Math.round(parseFloat(e.style.height)), o = window.getComputedStyle(e, null),
+                i = Math.round(parseFloat(o.height));
+            if (i !== t ? "visible" !== o.overflowY && (n("visible"), r(), i = Math.round(parseFloat(window.getComputedStyle(e, null).height))) : "hidden" !== o.overflowY && (n("hidden"), r(), i = Math.round(parseFloat(window.getComputedStyle(e, null).height))), a !== i) {
+                a = i;
+                var l = d("autosize:resized");
+                try {
+                    e.dispatchEvent(l)
+                } catch (e) {
+                }
+            }
+        }
+
+        if (e && e.nodeName && "TEXTAREA" === e.nodeName && !i.has(e)) {
+            var s = null, u = e.clientWidth, a = null, p = function () {
+                e.clientWidth !== u && l()
+            }, c = function (t) {
+                window.removeEventListener("resize", p, !1), e.removeEventListener("input", l, !1), e.removeEventListener("keyup", l, !1), e.removeEventListener("autosize:destroy", c, !1), e.removeEventListener("autosize:update", l, !1), Object.keys(t).forEach(function (n) {
+                    e.style[n] = t[n]
+                }), i.delete(e)
+            }.bind(e, {
+                height: e.style.height,
+                resize: e.style.resize,
+                overflowY: e.style.overflowY,
+                overflowX: e.style.overflowX,
+                wordWrap: e.style.wordWrap
+            });
+            e.addEventListener("autosize:destroy", c, !1), "onpropertychange" in e && "oninput" in e && e.addEventListener("keyup", l, !1), window.addEventListener("resize", p, !1), e.addEventListener("input", l, !1), e.addEventListener("autosize:update", l, !1), e.style.overflowX = "hidden", e.style.wordWrap = "break-word", i.set(e, {
+                destroy: c,
+                update: l
+            }), t()
+        }
+    }
+
+    function o(e) {
+        var t = i.get(e);
+        t && t.destroy()
+    }
+
+    function r(e) {
+        var t = i.get(e);
+        t && t.update()
+    }
+
+    var i = "function" == typeof Map ? new Map : function () {
+        var e = [], t = [];
+        return {
+            has: function (t) {
+                return e.indexOf(t) > -1
+            }, get: function (n) {
+                return t[e.indexOf(n)]
+            }, set: function (n, o) {
+                e.indexOf(n) === -1 && (e.push(n), t.push(o))
+            }, delete: function (n) {
+                var o = e.indexOf(n);
+                o > -1 && (e.splice(o, 1), t.splice(o, 1))
+            }
+        }
+    }(), d = function (e) {
+        return new Event(e, { bubbles: !0 })
+    };
+    try {
+        new Event("test")
+    } catch (e) {
+        d = function (e) {
+            var t = document.createEvent("Event");
+            return t.initEvent(e, !0, !1), t
+        }
+    }
+    var l = null;
+    "undefined" == typeof window || "function" != typeof window.getComputedStyle ? (l = function (e) {
+        return e
+    }, l.destroy = function (e) {
+        return e
+    }, l.update = function (e) {
+        return e
+    }) : (l = function (e, t) {
+        return e && Array.prototype.forEach.call(e.length ? e : [e], function (e) {
+            return n(e, t)
+        }), e
+    }, l.destroy = function (e) {
+        return e && Array.prototype.forEach.call(e.length ? e : [e], o), e
+    }, l.update = function (e) {
+        return e && Array.prototype.forEach.call(e.length ? e : [e], r), e
+    }), t.exports = l
+});
 
 /* Ripple */
 
 function initRipple() {
     if (!document.querySelectorAll) return;
     var rippleHandlers = document.querySelectorAll('.ripple-handler');
-    var redraw = function (el) { el.offsetTop + 1; }
+    var redraw = function (el) {
+        el.offsetTop + 1;
+    }
     var isTouch = ('ontouchstart' in window);
     for (var i = 0; i < rippleHandlers.length; i++) {
         (function (rippleHandler) {
@@ -402,6 +509,7 @@ function initRipple() {
                         document.removeEventListener('mouseup', onRippleEnd);
                     }
                 }
+
                 if (isTouch) {
                     document.addEventListener('touchend', onRippleEnd);
                     document.addEventListener('touchcancel', onRippleEnd);
@@ -409,6 +517,7 @@ function initRipple() {
                     document.addEventListener('mouseup', onRippleEnd);
                 }
             }
+
             if (isTouch) {
                 rippleHandler.removeEventListener('touchstart', onRippleStart);
                 rippleHandler.addEventListener('touchstart', onRippleStart);
