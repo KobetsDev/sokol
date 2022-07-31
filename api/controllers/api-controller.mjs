@@ -38,7 +38,7 @@ class ApiController {
         // }
         let prices = []
         // console.log(zap.order_data.toString())
-        zap.order_data = JSON.parse(zap.order_data)
+        zap.order_data = JSON.parse(zap.order_data.toString())
         console.log(zap.order_data)
         for (var key in zap.order_data) {
             console.log(zap.order_data[key].id)
@@ -68,10 +68,9 @@ class ApiController {
         // res.json('qwe')
         await axios.post(link, cart)
             .then((data) => {
-                console.log('data', data)
                 return res.json({ status: 'ok', url: data.data.result })
             }).catch((err) => {
-                console.log(err)
+                console.log('err')
                 return res.json({ status: 'bad' })
             });
     }
