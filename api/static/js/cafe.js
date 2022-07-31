@@ -275,26 +275,25 @@ var Cafe = {
             }
             Cafe.toggleLoading(true);
             Cafe.apiRequest('makeOrder', params, function (result) {
+                console.log(result)
                 Cafe.toggleLoading(false);
-                if (result.ok) {
-                    if (invoiceSupported) {
-                        Telegram.WebApp.openInvoice(result.invoice_url, function (status) {
-                            if (status == 'paid') {
-                                Telegram.WebApp.close();
-                            } else if (status == 'failed') {
-                                Telegram.WebApp.HapticFeedback.notificationOccurred('error');
-                                Cafe.showStatus('Payment has been failed.');
-                            } else {
-                                Telegram.WebApp.HapticFeedback.notificationOccurred('warning');
-                                Cafe.showStatus('You have cancelled this order.');
-                            }
-                        });
-                    } else {
-                        Telegram.WebApp.close();
-                    }
+                if (result.url) {
+                    Telegram.WebApp.openInvoice(result.url, function (status) {
+                        console.log(status)
+                        Telegram.WebApp.close()
+                        if (status == 'paid') {
+                            Telegram.WebApp.close();
+                        } else if (status == 'failed') {
+                            Telegram.WebApp.HapticFeedback.notificationOccurred('error');
+                            Cafe.showStatus('Payment has been failed.');
+                        } else {
+                            Telegram.WebApp.HapticFeedback.notificationOccurred('warning');
+                            Cafe.showStatus('You have cancelled this order.');
+                        }
+                    });
+
                 }
                 if (result.error) {
-                    Telegram.WebApp.HapticFeedback.notificationOccurred('error');
                     Cafe.showStatus(result.error);
                 }
             });

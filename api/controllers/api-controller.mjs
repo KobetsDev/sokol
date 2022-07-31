@@ -13,20 +13,22 @@ class ApiController {
     }
     // http://localhost:8000/api/create_link
     async create_link(req, res, next) {
+        let zap = req.body
+        console.log(zap)
         // то что приходит
-        let zap = {
-            "order_data":
-                [{
-                    "id": 123,
-                    "count": 3
-                }, {
-                    "id": 124,
-                    "count": 2
-                }],
-            "comment": "тут типо пожелания при заказе",
-            "user_id": 569452912,
-            "user_hash": null
-        }
+        // let zap = {
+        //     "order_data":
+        //         [{
+        //             "id": 123,
+        //             "count": 3
+        //         }, {
+        //             "id": 124,
+        //             "count": 2
+        //         }],
+        //     "comment": "тут типо пожелания при заказе",
+        //     "user_id": 569452912,
+        //     "user_hash": null
+        // }
         let prices = []
         for (var key in zap.order_data) {
             console.log(zap.order_data[key].id)
