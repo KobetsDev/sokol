@@ -59,7 +59,7 @@ class ApiController {
             'photo_width': 512,
             'photo_size': 512,
             'is_flexible': false,
-            'prices': JSON.stringify(prices),
+            'prices': (prices),
             'max_tip_amount': 30_00,
             'suggested_tip_amounts': [10_00, 20_00, 30_00],
             'start_parameter': 'time-machine-example',
@@ -70,7 +70,7 @@ class ApiController {
             .then((data) => {
                 return res.json({ status: 'ok', url: data.data.result })
             }).catch((err) => {
-                console.log('err')
+                console.log(err)
                 return res.json({ status: 'bad' })
             });
     }
